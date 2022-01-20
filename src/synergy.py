@@ -73,7 +73,7 @@ def teamData(team, data1, data2, opp1, opp2):
     data2.clear()
 
     # create new driver
-    driver = webdriver.Firefox(executable_path='/Users/fbjerknes/PycharmProjects/dosastuff/src/geckodriver.exe')
+    driver = webdriver.Chrome(executable_path='/Users/maxcunningham/Downloads/chromedriver')
     driver.get("https://www.synergysportstech.com/synergy/")
     assert "Synergy" in driver.title
 
@@ -220,7 +220,6 @@ def teamData(team, data1, data2, opp1, opp2):
                         tempOuter4.append(tempInner)
             opp2.append(tempOuter4)
 
-
         else:
             """
             Current team is the away team, so we collect away data first (1st and 2nd for loop), and then the home team data
@@ -349,7 +348,6 @@ def dictify(teamname):
     d = {}
     for lst in names:
         d[lst] = []
-
     return d
 
 
