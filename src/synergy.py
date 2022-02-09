@@ -16,50 +16,7 @@ import time
 import pandas as pd
 
 
-def dropdown(team):
-    ''' - - - - - - - - - - - - - - - - - - - - - - - -
-    Determines the input team's dropdown search string. Only NCAC teams.
-    '''
-    if team == "Denison":
-        return "Denison (OH) Big Red"
-    elif team == "Wittenberg" or "Witt":
-        return "Wittenberg"
-    elif team == "Wooster":
-        return "Wooster Fighting Scots"
-    elif team == "OWU":
-        return "Ohio Wesleyan"
-    elif team == "Hiram":
-        return "Hiram Terriers"
-    elif team == "Wabash":
-        return "Wabash College Little Giants"
-    elif team == "Depauw":
-        return "DePauw University Tigers"
-    elif team == "Oberlin":
-        return "Oberlin College Yeomen"
-    elif team == "Kenyon":
-        return "Kenyon Lords"
-    elif team == "Allegheny":
-        return "Allegheny Gators"
-
-
-def confirm_element(xpath, driver):
-    ''' - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    Function that confirms the existence of an element, given that element's xpath.
-    The reason for this function is that some teams don't record Extended Box Score (EBS), which we need
-    to analyze data. IE: Mount Vernon Nazarene
-    xpath - xpath of the element whose existence we're confirming
-    driver - webdriver used to access the site, pass this so we don't have to create another webdriver
-    If this element does not exist, we need to skip this team.
-    Returns True if the element exists, False if not.
-    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - '''
-    if driver.find_elements_by_xpath(xpath):
-        return True
-    else:
-        return False
-
-
-def teamData(team, data1, data2, opp1, opp2):
+def teamData(team):
     ''' - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     Function aggregating EBS stats from every game of every team into each team's respective List of Lists of Lists.
     team - team whose data is currently being collected.
@@ -68,20 +25,17 @@ def teamData(team, data1, data2, opp1, opp2):
     opp1 and opp2 - storage for the opponent's tables for each game
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - '''
 
-    # make sure datasets are cleared first
-    data1.clear()
-    data2.clear()
 
     # create new driver
-    driver = webdriver.Firefox(executable_path='/Users/fbjerknes/PycharmProjects/dosastuff/src/geckodriver.exe')
+    driver = webdriver.Chrome(executable_path='/Users/fbjerknes/PycharmProjects/dosastuff/src/chromedriver.exe')
     driver.get("https://www.synergysportstech.com/synergy/")
     assert "Synergy" in driver.title
 
     # *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
     # NOTE: USER: Insert Sports Synergy Tech Credentials below
 
-    user = driver.find_element_by_name("txtUserName")
-    pword = driver.find_element_by_name("txtPassword")
+    user = driver.find_element(By.NAME, "txtUserName")
+    pword = driver.find_element(By.NAME, "txtPassword")
 
     # Clear previous inputs
     user.clear()
@@ -93,284 +47,135 @@ def teamData(team, data1, data2, opp1, opp2):
 
     pword.send_keys(Keys.RETURN)  # Presses "Enter" Key, submitting the credentials to SST
 
-    # *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
-    # Extended Box Score (EBS) Collections
 
-    # WebDriverWait allows us to wait until a certain condition is met. In this case we're waiting for the "Game" button.
-    ## Path used to access 'Game' button
-    Game_xpath = '/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/div[2]/center/div[2]/div[2]/table[3]/tbody/tr[2]/td/center/a/font/b'
-    wait = WebDriverWait(driver, 300)
-    wait.until(EC.presence_of_element_located((By.XPATH, Game_xpath)))  ## Wait until the 'Game' button loads in
-    gameButton = driver.find_element_by_xpath(Game_xpath)
-    gameButton.click()
+    teamButton = driver.find_element(By.LINK_TEXT, "Team")
+    teamButton.click()
 
-    # Use the 'dropdown' function in order to find the correct 'dropdown string' for the team on the SST site.
-    # This string is then entered into the textbox at 'dropdownpath', we wait for the textbox to load in before we fill it.
-    dropdown_wait = WebDriverWait(driver, 60)
-    dropdown_wait.until(EC.presence_of_element_located(
-        (By.XPATH, '//*[@id="ctl00_MainContent_lstTeamA"]')))  ## Wait until the 'Game' button loads in
-    DDstring = dropdown(team)
-    dropdownpath = '//*[@id="ctl00_MainContent_lstTeamA"]/option[text()="{}"]'.format(DDstring)
-    elem = driver.find_element_by_xpath(dropdownpath).click()
-    time.sleep(3)
-    # row_count is the number of games the current team played this season.
-    row_count = len(driver.find_elements_by_xpath("//table[2]/tbody/tr"))
+    teamName = driver.find_element(By.NAME, "ctl00$MainContent$lstTeam")
+    teamName.send_keys(team)
 
-    # We iterate through the table containing every game for the current team in this season, and select (click) each one.
-    ## Once we select the game, we can access the game's data
-    shortWait = WebDriverWait(driver, 30)
-    shortWait.until(EC.presence_of_element_located((By.XPATH,
-                                                    '/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/table[2]/tbody/tr[2]/td[2]/a')))
+    time.sleep(5)
 
-    # Can't have games that don't have EBS
-    for i in range(2, row_count + 1):
-        path = "/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/table[2]/tbody/tr[{}]/td[2]/a".format(
-            i)
-        elem = driver.find_element_by_xpath(path)
-        print(elem.text)
-        if elem.text != "Denison(OH)@MountVernon":
-            elem.click()
-    # Now we have a tab open for each game played in the season, each tab has the EBS we want to scrape.
-    driver.switch_to.default_content()
+    offData = driver.find_element(By.XPATH, '//td[@id="mainBackgroundColumn"]').text
 
-    ## Preliminary for loop to make sure each game has an EBS, before we dive into the fat for loop
-    ## If a game doesn't have 'home team' and 'away team' elements, then it doesn't have an EBS
-    ## NOTE: if a game has an EBS, it will start on the EBS tab
+    defButton = driver.find_element(By.LINK_TEXT, "Defensive")
+    defButton.click()
 
-    home_xpath = '/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[1]/tbody/tr[1]/td[1]'
-    away_xpath = '/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[3]/tbody/tr[1]/td[1]'
-    EBS_xpath = '//*[@id="ctl00_MainContent_btnBoxScore"]'
+    time.sleep(5)
 
-    # need a list of indices that we skip - these are games that don't have Extended Box Scores -- no data
-    for i in range(1, len(driver.window_handles)):
+    defData = driver.find_element(By.XPATH, '//td[@id="mainBackgroundColumn"]').text
 
-        driver.switch_to.window(driver.window_handles[i])
+    cbButton = driver.find_element(By.LINK_TEXT, "Cumulative Box")
+    cbButton.click()
 
-        # Find Home team
-        wait = WebDriverWait(driver, 180)
-        wait.until(EC.presence_of_element_located((By.XPATH, home_xpath)))
-        hometeam = driver.find_element_by_xpath(home_xpath)
+    time.sleep(5)
 
-        # Find Away team
-        wait.until(EC.presence_of_element_located((By.XPATH, away_xpath)))
-        awayteam = driver.find_element_by_xpath(away_xpath)
-
-        row_count_table1 = len(driver.find_elements_by_xpath(
-            '/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[1]/tbody/tr'))
-        row_count_table2 = len(driver.find_elements_by_xpath(
-            '/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[3]/tbody/tr'))
-
-        # Variable counts for both EBS tables on each tab.
-        col_count_table1 = 16
-        col_count_table2 = 22
-
-        # 4 Outer lists to prevent scope issues.
-        tempOuter1 = []
-        tempOuter2 = []
-        tempOuter3 = []
-        tempOuter4 = []
-
-        """
-        If the current team is the home team, we collect both Home EBS tables (1st and 2nd for loops) and both Away EBS tables
-        (3rd and 4th for loops). This logic proceeds with the formatting of the table - the Home team's tables are always first
-        and the Away team's tables second.
-        """
-        if hometeam.text == DDstring:
-            for i in range(2, row_count_table1 + 1):  # team table 1 (Home)
-                tempInner = []
-                for x in range(1, col_count_table1):
-                    path = "/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[1]/tbody/tr[{}]/td[{}]".format(
-                        i, x)
-                    elem1 = driver.find_element_by_xpath(path)
-                    tempInner.append(elem1.text)
-                    if len(tempInner) == 15:
-                        tempOuter1.append(tempInner)
-            data1.append(tempOuter1)  # append this table (stored as a list of lists) into the team LoLoL
-
-            for i in range(2, row_count_table1 + 1):  # team table 2 (Home)
-                tempInner = []
-                for x in range(1, col_count_table2):
-                    path = "/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[2]/tbody/tr[{}]/td[{}]".format(
-                        i, x)
-                    elem2 = driver.find_element_by_xpath(path)
-                    tempInner.append(elem2.text)
-                    if len(tempInner) == 15:
-                        tempOuter2.append(tempInner)
-            data2.append(tempOuter2)
-
-            for i in range(2, row_count_table2 + 1):  # Opponent team table 1 (Away)
-                tempInner = []
-                for x in range(1, col_count_table1):
-                    path = "/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[3]/tbody/tr[{}]/td[{}]".format(
-                        i, x)
-                    elem1 = driver.find_element_by_xpath(path)
-                    tempInner.append(elem1.text)
-                    if len(tempInner) == 15:
-                        tempOuter3.append(tempInner)
-            opp1.append(tempOuter3)
-
-            for i in range(2, row_count_table2 + 1):  # Opponent team table 1 (Away)
-                tempInner = []
-                for x in range(1, col_count_table2):
-                    path = "/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[4]/tbody/tr[{}]/td[{}]".format(
-                        i, x)
-                    elem2 = driver.find_element_by_xpath(path)
-                    tempInner.append(elem2.text)
-                    if len(tempInner) == 15:
-                        tempOuter4.append(tempInner)
-            opp2.append(tempOuter4)
-
-
-        else:
-            """
-            Current team is the away team, so we collect away data first (1st and 2nd for loop), and then the home team data
-            AKA the opponent Data (3rd and 4th for loops)
-            """
-            for i in range(2, row_count_table2 + 1):  # team table 1 (Away)
-                tempInner = []
-                for x in range(1, col_count_table1):
-                    path = "/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[3]/tbody/tr[{}]/td[{}]".format(
-                        i, x)
-                    elem1 = driver.find_element_by_xpath(path)
-                    tempInner.append(elem1.text)
-                    if len(tempInner) == 15:
-                        tempOuter3.append(tempInner)
-            data1.append(tempOuter3)
-
-            for i in range(2, row_count_table2 + 1):  # team table 2 (Away)
-                tempInner = []
-                for x in range(1, col_count_table2):
-                    path = "/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[4]/tbody/tr[{}]/td[{}]".format(
-                        i, x)
-                    elem2 = driver.find_element_by_xpath(path)
-                    tempInner.append(elem2.text)
-                    if len(tempInner) == 15:
-                        tempOuter4.append(tempInner)
-            data2.append(tempOuter4)
-
-            for i in range(2, row_count_table1 + 1):  # opponent table 1 (Home)
-                tempInner = []
-                for x in range(1, col_count_table1):
-                    path = "/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[1]/tbody/tr[{}]/td[{}]".format(
-                        i, x)
-                    elem1 = driver.find_element_by_xpath(path)
-                    tempInner.append(elem1.text)
-                    if len(tempInner) == 15:
-                        tempOuter1.append(tempInner)
-            opp1.append(tempOuter1)
-
-            for i in range(2, row_count_table1 + 1):  # opponent table 2 (Home)
-                tempInner = []
-                for x in range(1, col_count_table2):
-                    path = "/html/body/form/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/div/span/nobr/div/table[2]/tbody/tr[{}]/td[{}]".format(
-                        i, x)
-                    elem2 = driver.find_element_by_xpath(path)
-                    tempInner.append(elem2.text)
-                    if len(tempInner) == 15:
-                        tempOuter2.append(tempInner)
-            opp2.append(tempOuter2)
+    cbData = driver.find_element(By.XPATH, '//td[@id="mainBackgroundColumn"]').text
 
     driver.quit()  # Close driver once we get our data.
 
-
-def toPanda1(data1, opp1, teamname):
-    ''' - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Converts first tabular dataset into a pandas dataframe and exports it. Does so for the Opponent dataset as well.
-    The naming conventions are such that the 4 subsequent .csv files are for each game
-    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - '''
-
-    # create header lists for table headers
-    headerlist1 = ["Player", "Min", "SST", "SST ex Pts", "Pts", "PPP", "Ast", "T/O", "Ast/TO", "Stl", "Stl Pos", "Blk",
-                   "Ttl Reb", "Off Reb", "Def Reb"]
-    counter = 1
-
-    for table in data1:
-        # Dynamically create names for each CSV export
-        csv_name = teamname + "_" + str(counter) + "_Table1.csv"
-        df = pd.DataFrame(table, columns=headerlist1)
-        df['Min'] = df['Min'].str.split(":").str[0]  # Convert minutes to alpha numeric
-        df.replace('-', 0)  # Convert -'s to 0's for aggregation
-        df.to_csv(csv_name)
-        counter = counter + 1
-
-    # Reset counter for naming CSVs
-    counter = 1
-    for table in opp1:
-        csv_name = teamname + "_" + str(counter) + "_Opponent_Table1.csv"
-        df = pd.DataFrame(table, columns=headerlist1)
-        df['Min'] = df['Min'].str.split(":").str[0]
-        df.replace('-', 0)
-        df.to_csv(csv_name)
-        counter = counter + 1
+    return [offData, defData, cbData]
 
 
-def toPanda2(data2, opp2, teamname):
-    ''' - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Converts second tabular dataset into a pandas dataframe and exports it. Does so for the Opponent dataset as well.
-    The naming conventions are such that the 4 subsequent .csv files are for each game
-    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - '''
+def process_data(data):
 
-    headerlist2 = ["Player", "FGA", "FGM", "FGm", "FG%", "aFG%", "2 FGA", "2 FGM", "2 FGm", "2 FG%", "3 FGA", "3 FGM",
-                   "3 FGm", "3FG%", "FTA", "FTM", "FTm", "FT%", "+1", "PF Tken", "PF Com"]
-    counter = 1
+    lines = []
+    last = 0
 
-    for table in data2:
-        csv_name = teamname + "_" + str(counter) + "_Table2.csv"
-        df = pd.DataFrame(table, columns=headerlist2)
-        df.replace('-', 0)
-        df.to_csv(csv_name)
-        counter = counter + 1
+    for i in range(len(data)):
+        if data[i] == '\n':
+            lines.append(data[last:i])
+            last = i+1
 
-    counter = 1
-    for table in opp2:
-        csv_name = teamname + "_" + str(counter) + "_Opponent_Table2.csv"
-        df = pd.DataFrame(table, columns=headerlist2)
-        df.replace('-', 0)
-        df.to_csv(csv_name)
-        counter = counter + 1
+    lines = lines[6:]
+    lines.append('')
+    lines.append('')
+
+    sections = {}
+
+    last = 0
+
+    for i in range(len(lines)):
+        if (lines[i] == '' and lines[i-1] == ''):
+            temp = lines[last+16:i-1]
+            sections[lines[last]] = temp
+            last = i+1
+
+    table = {}
+
+    for k, v in sections.items():
+        t1 = {}
+        for i in v:
+            temp = 0
+            t2 = []
+            name = ''
+            for j in range(len(i)):
+                if i[j] == ' ':
+                    if not (len(t2) == 5 and (ord(i[j+1]) < 47 or ord(i[j+1]) > 58)):
+                        if name != '':
+                            t2.append(i[temp:j])
+                        elif ord(i[j+1]) > 47 and ord(i[j+1]) < 58:
+                            name = i[:j]
+                    temp = j+1
+            t2.append(i[temp:])
+            if name != '':
+                while name[0] == ' ':
+                    name = name[1:]
+                t1[name] = t2
+        table[k] = t1
+
+    return table
 
 
-def store(teamname, dictionary):
-    ''' - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Runs teamData, toPanda1, and toPanda2 on each team in the NCAC, effectively gathering and storing
-    all EBS data for every team.
-    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - '''
-    d = dictionary[str(teamname)]
+def process_box(data):
+    lines = []
+    last = 0
+    for i in range(len(data)):
+        if data[i] == '\n':
+            lines.append(data[last:i])
+            last = i+1
+    lines.append(data[last:])
 
-    teamData(teamname, d["Data1"], d["Data2"], d["Opp1"], d["Opp2"])
-    toPanda1(d["Data1"], d["Opp1"], teamname)
-    toPanda2(d["Data2"], d["Opp2"], teamname)
+    vals = []
+    for i in lines:
+        if "Team Totals" in i:
+            prev = 0
+            count = 0
+            for j in range(len(i)):
+                if i[j] == ' ':
+                    count += 1
+                    if count > 2 and i[prev:j] != "Team" and i[prev:j] != "Totals":
+                        vals.append(i[prev:j])
+                    prev = j+1
+            vals.append(i[prev:])
+
+    return vals
 
 
-def dictify(teamname):
-    # names of the 4 different lists needed for each team
-    names = ["Data1", "Data2", "Opp1", "Opp2"]
 
-    d = {}
-    for lst in names:
-        d[lst] = []
-
-    return d
+def google(tables, rice, sheet_name):
+    print(tables)
+    print(rice)
+    print(sheet_name)
 
 
 def main():
-    NCAC = ["Denison", "Witt", "Wooster", "OWU", "Hiram", "Wabash", "Depauw", "Oberlin", "Kenyon", "Allegheny"]
+    team = "Purdue Boilermakers"
+    sheet_name = ""
 
-    dictlist = []
-    # Create list dictionaries for every NCAC team
-    for team in NCAC:
-        d_name = str(team) + "Dict"  # Name dictionaries by team
-        d_name = dictify(team)
-        dictlist.append(d_name)
+    data = teamData(team)
+    tables = []
+    for i in range(2):
+        tables.append(process_data(data[i]))
+    tables.append(process_box(data[2]))
 
-    # Create dictionary storing all team dictionaries
-    dict_dict = {}
-    for i in range(len(NCAC)):
-        dict_dict[NCAC[i]] = dictlist[i]
+    rice = teamData("Rice Owls")
+    rtables = []
+    for i in range(2):
+        rtables.append(process_data(rice[i]))
+    rtables.append(process_box(rice[2]))
 
-    # Collect data for every NCAC team
-    for team in NCAC:
-        store(team, dict_dict)
+    google(tables, rtables, sheet_name)
 
 
 if __name__ == "__main__":
