@@ -27,7 +27,9 @@ def teamData(team):
 
 
     # create new driver
+
     driver = webdriver.Chrome(executable_path='/Users/fbjerknes/PycharmProjects/dosastuff/src/chromedriver.exe')
+
     driver.get("https://www.synergysportstech.com/synergy/")
     assert "Synergy" in driver.title
 
@@ -47,30 +49,30 @@ def teamData(team):
 
     pword.send_keys(Keys.RETURN)  # Presses "Enter" Key, submitting the credentials to SST
 
-
     teamButton = driver.find_element(By.LINK_TEXT, "Team")
     teamButton.click()
 
     teamName = driver.find_element(By.NAME, "ctl00$MainContent$lstTeam")
     teamName.send_keys(team)
 
-    time.sleep(5)
+    time.sleep(10)
 
     offData = driver.find_element(By.XPATH, '//td[@id="mainBackgroundColumn"]').text
 
     defButton = driver.find_element(By.LINK_TEXT, "Defensive")
     defButton.click()
 
-    time.sleep(5)
+    time.sleep(10)
 
     defData = driver.find_element(By.XPATH, '//td[@id="mainBackgroundColumn"]').text
 
     cbButton = driver.find_element(By.LINK_TEXT, "Cumulative Box")
     cbButton.click()
 
-    time.sleep(5)
+    time.sleep(10)
 
     cbData = driver.find_element(By.XPATH, '//td[@id="mainBackgroundColumn"]').text
+
 
     driver.quit()  # Close driver once we get our data.
 
@@ -150,7 +152,6 @@ def process_box(data):
             vals.append(i[prev:])
 
     return vals
-
 
 
 def google(tables, rice, sheet_name):
