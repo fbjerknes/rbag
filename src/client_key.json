@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "rbag-synergy-acess",
+  "private_key_id": "41f36202dc7f3f386194296e9d4e2229517ab627",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDFg4dzoP5z5SN/\nPtpt4prNNa9De6TZV5KDdcusmE+6F5wd9ba0G/iYkfdldxlffViC0T/70z4j6ugR\nG0eo7pd1mXi0g3v2iCqIymLa1Tg8i98pxu4+OZpfNnM4JEEjxMyITQ7kPQAi4Rnh\nKanimg2V3+QMkhU4NbifzTlvEQt1YzTcfqs1bQiRd5TSG3X4DSMHwX/3Pqa1k1C+\n62uT0LBeLDD6/zxLIg0ObFlhvmeH5uKzNTt/fYG9JYC568fsFt6fjdKpodu2vxrH\nnyrkt50ASuw1vrBzfAU/7iLmdljR1IEbkyRlU7RKb1X6X0AIK5EV2F9jkSwb+OBC\nFiWlmzBDAgMBAAECggEABDbQfZnwCsD7q8LHjAHLbyslfQKJMnMUclPhpk/uMUGu\njwmnopFGNkjZRwPJy/F8s63UZfA6Kp1yK9Romm4cxSq1Gk4D3oGO9HsPP7903pFE\nRs4ynxlBPxNhwxhQpJ/e35UJ4pXoUR9WrXIH1nZx1zA2AEM7XT3xVDLx4+eeVmWo\nus6I4O/d/NBNlc/mHLBDtS47ksakPfMKkJPmSN+3W5QZA4s4VGYDgpY5KcV/Z2Pm\n/dl0lantN2iWMBElzoma47KD7uYhnGfeQBpb8hvX2ovsepl1G9jTrojjWT9iGx5u\nSY6SuwVP/L5bKfPjePgxKwh5TH8OAw0Czxra55sJwQKBgQDo/XpJHbF9ZH0mjqf/\nvvUKPWxlehN3Opq3dZ9aKo5yjrYukplQAvHcA4icxD8CM4E0QptbsvTYUVzzGdEk\nlBc7FOhVyRzyRkTEUpuk1D2Ap9Z6MJ460lzbgSC0QnA1rxfcH8rPh7DLJF6PvLWc\nkBkLBeVNptN6KpazkpzoCFVV+wKBgQDZBSDKzq1obCqji5Msx0DTRMxwZ6Ffz2yh\naWHT294UZ/0sAbmj9MwWxzLE4YkDxJHqzCodeb1ijzuMxf4nHYUvEpoMJ2LRVMwU\nwygGw2mJIQxR293fDf0KDvCoUAnqz8f/5hLfFopnC8u+Voak/F7r/1QYC8R0Wx8x\nRHVrnTskWQKBgQDcTyMclBlK6oR0uxwcdmKahi5DXkWdziqSI4TE68y6gju+mhyi\nTcaJNkYthlvWJwGbewgQk412Jqlvrg/XOLkmwsRWqc7XQJ6xzTMjjxWA3DOwYtyb\n3mKzpMxZ5yDXgnNbUCykRDhmPkO0Qsqv+onTpIWJAaCiuja6In5/4bFflQKBgCFQ\n7TjVQ7/NIzqaOczdBfGpFS2Iazi3MjkRYYhRr6U4VaCE30fxU8eHax7YdN1UNwZx\ns2F1CALydDTnTF4a5RBV7bpB7aSvPOlPEH0BUNlRbn++njAZCKibpIxiRTN8FHsP\nigQfhL3PDMc6p076w2O9fd53KACo4IACv3f22lZ5AoGAHoE+k8hZkc7x2gS6CQoO\nSpmSYqgPtQD0dRntt9hHeULt2CEIl4gvVC3XcUa5ZysksY/BWiCbOmmWnJyXCg7s\nv3k99CsyKDq+b1sFAWMBdcnEilE7lg3TI/gY7Gsp4Oh3bJaWlNONsb1IlIR/UWtb\n24Lt1sKL4YeXQVNC7HD7JVA=\n-----END PRIVATE KEY-----\n",
+  "client_email": "rbag-bot@rbag-synergy-acess.iam.gserviceaccount.com",
+  "client_id": "116832546469975619115",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/rbag-bot%40rbag-synergy-acess.iam.gserviceaccount.com"
+}
