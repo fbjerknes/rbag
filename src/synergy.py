@@ -336,14 +336,25 @@ def main():
     for i in range(2):
         tables.append(process_data(data[i]))
     tables.append(process_box(data[2]))
+    opp_players = player_names(tables)
 
     rice = teamData("Rice Owls")
     rtables = []
     for i in range(2):
         rtables.append(process_data(rice[i]))
     rtables.append(process_box(rice[2]))
+    rplayers = player_names(rtables)
 
     google(tables, rtables, sheet_name, team)
+    
+# get player names given a table for each team
+def player_names(tables):
+    e = list(tables[0]['Overall'].keys())[1:]
+    names = []
+    for i in e:
+        if len(i) != 0:
+            names.append(" ".join(i.split()[1:]))
+    return [e, names]
 
 
 if __name__ == "__main__":
