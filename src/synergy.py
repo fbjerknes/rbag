@@ -1,7 +1,6 @@
-
-# Imports allowing the use of Selenium and Geckodriver.
 from lxml import html
 from selenium import webdriver
+import numpy as np
 # Allows us to send keys through the Webdriver.
 from selenium.webdriver.common.keys import Keys
 # Allows us to wait for certain elements to load in. Gives us much more control over the Webdriver.
@@ -21,7 +20,7 @@ scope = [
     'https://www.googleapis.com/auth/drive',
     'https://www.googleapis.com/auth/drive.file'
     ]
-file_name = 'client_key.json'
+file_name = '/Users/maxcunningham/Downloads/client_key.json'
 creds = ServiceAccountCredentials.from_json_keyfile_name(file_name,scope)
 client = gspread.authorize(creds)
 
@@ -38,7 +37,7 @@ def teamData(team):
 
     # create new driver
 
-    driver = webdriver.Chrome(executable_path='/Users/fbjerknes/PycharmProjects/dosastuff/src/chromedriver.exe')
+    driver = webdriver.Chrome(executable_path='/Users/maxcunningham/Downloads/chromedriver')
 
     driver.get("https://www.synergysportstech.com/synergy/")
     assert "Synergy" in driver.title
@@ -137,7 +136,6 @@ def process_data(data):
         table[k] = t1
 
     return table
-
 
 def process_box(data):
     lines = []
@@ -326,6 +324,63 @@ def google(tables, rice, sheet_name, team_name):
     sheet.update_cell(27, 13, rice[1]['Overall Defense']['Transition'][10])
     sheet.update_cell(26, 14, rice[1]['Overall Defense']['Transition'][4][:-1])
 
+# get player names given a table for each team
+def player_names(tables):
+    e = list(tables[0]['Overall'].keys())[1:]
+    names = []
+    for i in e:
+        if len(i) != 0:
+            names.append(" ".join(i.split()[1:]))
+    return [e, names]
+
+# get statistics for each player on a given team
+def playerData(team, players):
+    # create new driver
+
+    driver = webdriver.Chrome(executable_path='/Users/maxcunningham/Downloads/chromedriver')
+
+    driver.get("https://www.synergysportstech.com/synergy/")
+    assert "Synergy" in driver.title
+
+    # *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+    # NOTE: USER: Insert Sports Synergy Tech Credentials below
+
+    user = driver.find_element(By.NAME, "txtUserName")
+    pword = driver.find_element(By.NAME, "txtPassword")
+
+    # Clear previous inputs
+    user.clear()
+    pword.clear()
+
+    # Send the User's SST Email and Pass to the text field elements
+    user.send_keys("fmb1@rice.edu")  # Insert Email inside of quotes
+    pword.send_keys("R!ceOwls21")  # Insert Password inside of quotes
+
+    pword.send_keys(Keys.RETURN)  # Presses "Enter" Key, submitting the credentials to SST
+
+    teamButton = driver.find_element(By.LINK_TEXT, "Team")
+    teamButton.click()
+
+    teamName = driver.find_element(By.NAME, "ctl00$MainContent$lstTeam")
+    teamName.send_keys(team)
+
+    time.sleep(5)
+
+    # get each player's spreadsheet
+    pdata = []
+    for i in players:
+        pbutton = driver.find_element(By.LINK_TEXT, i)
+        pbutton.click()
+        time.sleep(5)
+        pdata.append(driver.find_element(By.XPATH, '//td[@id="mainBackgroundColumn"]').text)
+
+    # see if process_data works for player spreadsheets (it probably needs adjusting)
+    pdict = []
+    for j in pdata:
+        pdict.append(process_data(j))
+    driver.quit()
+    return pdict
+
 
 def main():
     team = "Florida International Panthers"
@@ -337,13 +392,19 @@ def main():
         tables.append(process_data(data[i]))
     tables.append(process_box(data[2]))
 
-    rice = teamData("Rice Owls")
-    rtables = []
-    for i in range(2):
-        rtables.append(process_data(rice[i]))
-    rtables.append(process_box(rice[2]))
+    opp_players = player_names(tables)
+    playerData(team, opp_players[0])
 
-    google(tables, rtables, sheet_name, team)
+    #rice = teamData("Rice Owls")
+    #rtables = []
+    #for i in range(2):
+    #    rtables.append(process_data(rice[i]))
+    #rtables.append(process_box(rice[2]))
+    #rplayers = player_names(rtables)
+    #rdata = playerData(rplayers)
+
+    #google(tables, rtables, sheet_name, team)
+    #player_names(tables, team)
 
 
 if __name__ == "__main__":
